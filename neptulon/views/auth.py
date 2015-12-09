@@ -27,6 +27,6 @@ def check_user():
     password = request.form.get('password', '')
 
     user = User.get_by_name(name) or User.get_by_email(name)
-    if not (user and user.check_passowrd(password)):
+    if not (user and user.check_password(password)):
         return jsonify({'message': 'no'}), 403
     return jsonify({'message': 'yes'}), 200
