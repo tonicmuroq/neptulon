@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{% block title %}{% endblock %} · Neptulon </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le styles -->
+    <link href="/neptulon/static/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="/neptulon/static/css/flat-ui.min.css" rel="stylesheet" type="text/css">
+    <script src="/neptulon/static/js/jquery.min.js"></script>
+    <script src="/neptulon/static/js/flat-ui.min.js"></script>
+    {% block more_header %}{% endblock %}
+    <style>
+      {% block more_css %}{% endblock more_css %}
+      nav.navbar {border-radius: 0!important;}
+    </style>
+    <!-- COLLECTED CSS -->
+  </head>
+
+  <body>
+
+    {% block nav %}
+    <!-- Docs master nav -->
+    <nav class="navbar navbar-inverse" role="navigation">
+      <div class="navbar-header">
+          <a href="{{ url_for('ui.index') }}" class="navbar-brand">Neptulon</a>
+      </div>
+      <div class="collapse navbar-collapse">
+        <ul class="nav navbar-nav">
+          <li class="{{ 'active' if request.path == url_for('ui.index') else '' }}">
+            <a href="{{ url_for('ui.index') }}"><span class="fui-list-bulleted"></span> 所有授权列表</a>
+          </li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ g.user.name or '你谁啊' }} <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              {% if g.user %}
+                <li><a href="{{ url_for('ui.password') }}">改个密码</a></li>
+                <li class="divider"></li>
+                <li><a href="{{ url_for('ui.logout') }}">再贱</a></li>
+              {% else %}
+                <li><a href="{{ url_for('ui.login') }}">大爷来玩啊</a></li>
+              {% endif %}
+            </ul>
+          </li>
+        </ul>
+      <div>
+    </nav>
+    {% endblock %}
+
+    <!-- Docs page layout -->
+    <div class="bs-header" id="content">
+      <div class="container">
+        {% block more_content_header %}{% endblock %}
+      </div>
+    </div>
+
+    <div class="container bs-docs-container">
+      <div class="row">
+      {% block main %}
+      {% endblock %}
+      </div>
+    </div>
+
+    <!-- Footer ================================================== -->
+    <footer class="footer container">
+        {% block footer %}{% endblock %}
+    </footer>
+
+    <!-- Le javascript ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    {% block bottom_script %}{% endblock %}
+    <!-- COLLECTED JS -->
+  </body>
+</html>

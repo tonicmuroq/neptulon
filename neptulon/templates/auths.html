@@ -1,0 +1,24 @@
+{% extends "/base.html" %}
+
+{% block main %}
+  <ul class="list-group">
+    {% for auth in auths %}
+    <li class="list-group-item"> {{ auth.url }}
+      <a class="btn btn-xs btn-warning pull-right" data-auth-id="{{ auth.id }}">嫑了</a>
+    </li>
+    {% else %}
+    什么都妹有
+    {% endfor %}
+  </ul>
+{% endblock %}
+
+{% block bottom_script %}
+<script>
+  $('.btn').click(function (){
+    var self = $(this);
+    $.post('/ui/delete_auth', {auth_id: self.data('auth-id')}, function (){
+      self.parent().remove();
+    });
+  });
+</script>
+{% endblock %}
