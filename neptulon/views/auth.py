@@ -2,7 +2,7 @@
 
 from flask import Blueprint, request, jsonify
 
-from neptulon.models import Auth
+from neptulon.models import Auth, User
 
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
@@ -19,3 +19,14 @@ def get_profile():
         return jsonify({}), 404
 
     return jsonify(auth.user.to_dict()), 200
+
+
+@bp.route('/check', methods=['POST'])
+def check_user():
+    name = request.form.get('name', '')
+    password = request.form.get('password', '')
+
+    user = User.get_by_name(name) or User.get_by_email(name)
+    if not (user and user.check_passowrd(password)):
+        return jsonify({'message': 'no'}), 403
+    return jsonify({'message': 'yes'}), 200
