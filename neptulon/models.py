@@ -1,10 +1,9 @@
 # coding: utf-8
 
-import bcrypt
 import datetime
 import sqlalchemy.exc
 from sqlalchemy.ext.declarative import declared_attr
-from werkzeug.security import gen_salt
+from werkzeug.security import gen_salt, generate_password_hash, check_password_hash
 
 from .ext import db
 
@@ -63,14 +62,12 @@ class User(Base):
         return cls.query.filter_by(email=email).first()
 
     def set_password(self, password):
-        self.password = bcrypt.hashpw(_utf8(password), bcrypt.gensalt(8))
+        self.password = generate_password_hash(password)
         db.session.add(self)
         db.session.commit()
 
     def check_password(self, password):
-        if not (password and self.password):
-            return False
-        return bcrypt.hashpw(_utf8(password), _utf8(self.password)) == self.password
+        return check_password_hash(self.password, password)
 
     def get_auths(self):
         return Auth.query.filter_by(user_id=self.id).order_by(Auth.id.desc()).all()
