@@ -1,25 +1,12 @@
 # coding: utf-8
 
-from functools import wraps
 from flask import Blueprint, request, g, redirect, url_for, session, render_template, flash, jsonify
 
 from neptulon.models import Auth, User
+from neptulon.utils import need_login, login_user
 
 
 bp = Blueprint('ui', __name__, url_prefix='/ui')
-
-
-def need_login(f):
-    @wraps(f)
-    def _(*args, **kwargs):
-        if not g.user:
-            return redirect(url_for('ui.login', redirect=request.url))
-        return f(*args, **kwargs)
-    return _
-
-
-def login_user(user):
-    session['id'] = user.id
 
 
 @bp.route('/', methods=['GET'])
@@ -66,27 +53,6 @@ def login():
     return redirect(redir)
 
 
-@bp.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'GET':
-        return render_template('/register.html')
-
-    name = request.form['name']
-    email = request.form['email']
-    password = request.form['password']
-    if not (name and email and password):
-        flash(u'你有些忘记填了', 'error')
-        return render_template('/register.html')
-
-    u = User.create(name, email, password)
-    if not u:
-        flash(u'已经存在, 登录去吧', 'error')
-        return render_template('/register.html')
-
-    login_user(u)
-    return redirect(url_for('ui.index'))
-
-
 @bp.route('/password', methods=['GET', 'POST'])
 @need_login
 def password():
@@ -128,11 +94,3 @@ def authenticate():
         if auth:
             redir = '%s?token=%s' % (redir, auth.token)
     return redirect(redir)
-
-
-@bp.before_request
-def init_user():
-    g.user = None
-    if 'id' in session:
-        g.user = User.get(session['id'])
-    g.redir = request.args.get('redirect', '')

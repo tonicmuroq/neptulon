@@ -6,7 +6,6 @@ sys.path.append(os.path.abspath('.'))
 
 from neptulon.app import create_app
 from neptulon.ext import db
-from neptulon.models import User, Auth
 
 def flushdb(app):
     with app.app_context():

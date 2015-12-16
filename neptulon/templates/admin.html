@@ -1,0 +1,61 @@
+{% extends "/base.html" %}
+{% import "/utils.html" as utils %}
+
+{% block main %}
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <td>Name</td>
+        <td>Realname</td>
+        <td>Email</td>
+        <td>Admin</td>
+        <td>Ops</td>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users%}
+        <tr>
+            <td>{{ user.name }}</td>
+            <td>{{ user.real_name }}</td>
+            <td>{{ user.email }}</td>
+            <td>
+                {% if user.privilege %}
+                <span class="fui-check"></span>
+                {% else %}
+                <span class="fui-cross"></span>
+                {% endif %}
+            </td>
+            <td>
+                {% if user.id != g.user.id %}
+                <a id="delete" class="btn btn-xs btn-warning" data-user-id="{{ user.id }}">嫑了</a>
+                {% if user.privilege %}
+                <a id="sudo" class="btn btn-xs btn-success" data-user-id="{{ user.id }}"> unsudo </a>
+                {% else %}
+                <a id="sudo" class="btn btn-xs btn-danger" data-user-id="{{ user.id }}"> sudo </a>
+                {% endif %}
+                {% endif %}
+            </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+    <tbody>
+  </table>
+  {{utils.paginator(g.start, total, g.limit, endpoint)}}
+{% endblock %}
+
+{% block bottom_script %}
+<script>
+  $('a#delete').click(function (){
+    var self = $(this);
+    $.post('{{url_for('admin.delete_user')}}', {user_id: self.data('user-id')}, function (){
+      self.parent().remove();
+    });
+  });
+  $('a#sudo').click(function (){
+    var self = $(this);
+    $.post('{{url_for('admin.sudo')}}', {user_id: self.data('user-id')}, function (){
+      location.reload();
+    });
+  });
+</script>
+{% endblock %}
