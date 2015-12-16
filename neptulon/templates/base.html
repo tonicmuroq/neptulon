@@ -31,6 +31,14 @@
           <li class="{{ 'active' if request.path == url_for('ui.index') else '' }}">
             <a href="{{ url_for('ui.index') }}"><span class="fui-list-bulleted"></span> 所有授权列表</a>
           </li>
+          {% if g.user and g.user.privilege %}
+          <li class="{{ 'active' if request.path == url_for('admin.index') else '' }}">
+            <a href="{{ url_for('admin.index') }}"><span class="fui-user"></span> 老子要管人</a>
+          </li>
+          <li class="{{ 'active' if request.path == url_for('admin.register') else '' }}">
+            <a href="{{ url_for('admin.register') }}"><span class="fui-plus-circle"></span> 新员工入职啦 </a>
+          </li>
+          {% endif %}
         </ul>
         <ul class="nav navbar-nav navbar-right">
           <li class="dropdown">

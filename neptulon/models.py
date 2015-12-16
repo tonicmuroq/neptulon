@@ -37,14 +37,15 @@ class User(Base):
 
     name = db.Column(db.String(255), unique=True, nullable=False, default='')
     email = db.Column(db.String(255), unique=True, nullable=False, default='')
+    real_name = db.Column(db.String(255), unique=True, nullable=False, default='')
     password = db.Column(db.String(255), nullable=False, default='')
     privilege = db.Column(db.Integer, default=0)
     time = db.Column(db.DateTime, default=datetime.datetime.now)
 
     @classmethod
-    def create(cls, name, email, password):
+    def create(cls, name, email, password, real_name):
         try:
-            u = cls(name=name, email=email)
+            u = cls(name=name, email=email, real_name=real_name)
             db.session.add(u)
             db.session.commit()
             u.set_password(password)
@@ -61,8 +62,22 @@ class User(Base):
     def get_by_email(cls, email):
         return cls.query.filter_by(email=email).first()
 
+    @classmethod
+    def list_users(cls, start=0, limit=20):
+        q = cls.query.order_by(cls.id.desc())
+        total = q.count()
+        q = q.offset(start)
+        if limit is not None:
+            q = q.limit(limit)
+        return q.all(), total
+
     def set_password(self, password):
         self.password = generate_password_hash(password)
+        db.session.add(self)
+        db.session.commit()
+
+    def sudo(self):
+        self.privilege = 1 if not self.privilege else 0
         db.session.add(self)
         db.session.commit()
 
@@ -74,6 +89,10 @@ class User(Base):
 
     def to_dict(self):
         return {'name': self.name, 'email': self.email}
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
 
 
 class Auth(Base):
