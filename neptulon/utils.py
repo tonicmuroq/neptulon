@@ -2,7 +2,7 @@
 #coding:utf-8
 
 from functools import wraps
-from flask import g, redirect, url_for, session
+from flask import g, redirect, url_for, session, request
 
 def need_login(f):
     @wraps(f)
