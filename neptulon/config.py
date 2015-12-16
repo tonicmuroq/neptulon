@@ -2,6 +2,8 @@
 
 import os
 
+DEBUG = True
+
 MYSQL_HOST = os.getenv('MYSQL_HOST', 'localhost')
 MYSQL_PORT = int(os.getenv('MYSQL_PORT', '3306'))
 MYSQL_USER = os.getenv('MYSQL_USER', 'root')
@@ -13,6 +15,7 @@ SQLALCHEMY_POOL_TIMEOUT = 10
 SQLALCHEMY_POOL_RECYCLE = 2000
 
 SECRET_KEY = os.getenv('SECRET_KEY', '69wolegeca')
+SERVER_PORT = int(os.getenv('SERVER_PORT', '5000'))
 
 try:
     from .local_config import *
