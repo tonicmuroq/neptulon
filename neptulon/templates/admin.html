@@ -41,7 +41,7 @@
     </tbody>
     <tbody>
   </table>
-  {{utils.paginator(g.start, total, g.limit, endpoint)}}
+  {{utils.paginator(g.start, total, g.limit, endpoint, admin=admin)}}
 {% endblock %}
 
 {% block bottom_script %}

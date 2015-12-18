@@ -13,7 +13,7 @@ bp = Blueprint('admin', __name__, url_prefix='/admin')
 def index():
     admin = request.args.get('admin')
     users, total = User.list_users(admin=admin, start=g.start, limit=g.limit)
-    return render_template('/admin.html', users=users, total=total, endpoint='admin.index')
+    return render_template('/admin.html', users=users, total=total, endpoint='admin.index', admin=admin)
 
 @bp.route('/edit/<int:uid>', methods=['GET', 'POST'])
 @need_admin
