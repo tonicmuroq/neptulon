@@ -46,6 +46,9 @@
             <ul class="dropdown-menu">
               {% if g.user %}
                 <li><a href="{{ url_for('ui.password') }}">改个密码</a></li>
+                {% if g.user.privilege %}
+                  <li><a href="{{ url_for('admin.index', admin=1) }}">Admin 管理</a></li>
+                {% endif %}
                 <li class="divider"></li>
                 <li><a href="{{ url_for('ui.logout') }}">再贱</a></li>
               {% else %}

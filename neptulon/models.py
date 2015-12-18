@@ -63,13 +63,25 @@ class User(Base):
         return cls.query.filter_by(email=email).first()
 
     @classmethod
-    def list_users(cls, start=0, limit=20):
-        q = cls.query.order_by(cls.id.desc())
+    def list_users(cls, start=0, limit=20, admin=None):
+        if admin:
+            q = cls.query.filter_by(privilege=1).order_by(cls.id.desc())
+        else:
+            q = cls.query.order_by(cls.id.desc())
         total = q.count()
         q = q.offset(start)
         if limit is not None:
             q = q.limit(limit)
         return q.all(), total
+
+    def edit(self, name, email, password, real_name):
+        if password:
+            self.password = generate_password_hash(password)
+        self.name = name
+        self.email = email
+        self.real_name = real_name
+        db.session.add(self)
+        db.session.commit()
 
     def set_password(self, password):
         self.password = generate_password_hash(password)

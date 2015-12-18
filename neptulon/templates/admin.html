@@ -34,6 +34,7 @@
                 <a id="sudo" class="btn btn-xs btn-danger" data-user-id="{{ user.id }}"> sudo </a>
                 {% endif %}
                 {% endif %}
+                <a class="btn btn-xs btn-info" href="{{ url_for('admin.edit', uid=user.id) }}"> edit </a>
             </td>
         </tr>
       {% endfor %}
@@ -48,7 +49,7 @@
   $('a#delete').click(function (){
     var self = $(this);
     $.post('{{url_for('admin.delete_user')}}', {user_id: self.data('user-id')}, function (){
-      self.parent().remove();
+      self.parent().parent().remove();
     });
   });
   $('a#sudo').click(function (){
