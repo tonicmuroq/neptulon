@@ -1,7 +1,7 @@
 #!/usr/bin/python
 #coding:utf-8
 
-from flask import Blueprint, request, redirect, url_for, render_template, flash, jsonify, abort
+from flask import Blueprint, request, redirect, url_for, render_template, flash, jsonify, abort, g
 
 from neptulon.utils import need_admin
 from neptulon.models import User
@@ -12,7 +12,7 @@ bp = Blueprint('admin', __name__, url_prefix='/admin')
 @need_admin
 def index():
     admin = request.args.get('admin')
-    users, total = User.list_users(admin=admin)
+    users, total = User.list_users(admin=admin, start=g.start, limit=g.limit)
     return render_template('/admin.html', users=users, total=total, endpoint='admin.index')
 
 @bp.route('/edit/<int:uid>', methods=['GET', 'POST'])
