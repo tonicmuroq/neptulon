@@ -39,6 +39,7 @@ class User(Base):
     email = db.Column(db.String(255), unique=True, nullable=False, default='')
     real_name = db.Column(db.String(255), unique=True, nullable=False, default='')
     password = db.Column(db.String(255), nullable=False, default='')
+    token = db.Column(db.String(64), default=lambda: gen_salt(64), index=True)
     privilege = db.Column(db.Integer, default=0)
     time = db.Column(db.DateTime, default=datetime.datetime.now)
 
@@ -61,6 +62,10 @@ class User(Base):
     @classmethod
     def get_by_email(cls, email):
         return cls.query.filter_by(email=email).first()
+
+    @classmethod
+    def get_by_token(cls, token):
+        return cls.query.filter_by(token=token).first()
 
     @classmethod
     def list_users(cls, start=0, limit=20, admin=None):
@@ -88,6 +93,11 @@ class User(Base):
         db.session.add(self)
         db.session.commit()
 
+    def refresh_token(self):
+        self.token = gen_salt(64)
+        db.session.add(self)
+        db.session.commit()
+
     def sudo(self):
         self.privilege = 1 if not self.privilege else 0
         db.session.add(self)
@@ -100,7 +110,7 @@ class User(Base):
         return Auth.query.filter_by(user_id=self.id).order_by(Auth.id.desc()).all()
 
     def to_dict(self):
-        return {'name': self.name, 'email': self.email}
+        return {'name': self.name, 'email': self.email, 'realname': self.real_name}
 
     def delete(self):
         db.session.delete(self)

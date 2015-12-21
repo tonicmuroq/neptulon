@@ -16,6 +16,14 @@ SQLALCHEMY_POOL_RECYCLE = 2000
 
 SECRET_KEY = os.getenv('SECRET_KEY', '69wolegeca')
 SERVER_PORT = int(os.getenv('SERVER_PORT', '5000'))
+SERVER_NAME = os.getenv('SERVER_NAME')
+
+MAIL_SERVER = os.getenv('MAIL_SERVER', 'smtp.exmail.qq.com')
+MAIL_PORT = int(os.getenv('MAIL_PORT', '465'))
+MAIL_USE_TLS = bool(os.getenv('MAIL_USE_TLS', ''))
+MAIL_USE_SSL = bool(os.getenv('MAIL_USE_SSL', '1'))
+MAIL_USERNAME = os.getenv('MAIL_USERNAME', '')
+MAIL_PASSWORD = os.getenv('MAIL_PASSWORD', '')
 
 try:
     from .local_config import *

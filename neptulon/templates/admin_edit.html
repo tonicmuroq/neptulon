@@ -2,17 +2,17 @@
 
 {% block main %}
     <div class="login-form">
-      <form action="{{ url_for('admin.edit', uid=uid) }}" method="POST">
+      <form action="{{ url_for('admin.edit', uid=user.id) }}" method="POST">
         <div class="form-group">
-          <input name="name" class="form-control login-field" type="text" value="{{ name }}">
+          <input name="name" class="form-control login-field" type="text" value="{{ user.name }}">
           <label class="login-field-icon fui-user" for=""></label>
         </div>
         <div class="form-group">
-          <input name="real_name" class="form-control login-field" type="text" value="{{ real_name }}">
+          <input name="real_name" class="form-control login-field" type="text" value="{{ user.real_name }}">
           <label class="login-field-icon fui-tag" for=""></label>
         </div>
         <div class="form-group">
-          <input name="email" class="form-control login-field" type="email" value="{{ email }}">
+          <input name="email" class="form-control login-field" type="email" value="{{ user.email }}">
           <label class="login-field-icon fui-mail" for=""></label>
         </div>
         <div class="form-group">

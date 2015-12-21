@@ -1,7 +1,10 @@
 # coding: utf-8
 
 from flask import Blueprint, request, g, redirect, url_for, session, render_template, flash, jsonify
+from flask.ext.mail import Message
 
+from neptulon.ext import mail
+from neptulon.config import MAIL_USERNAME
 from neptulon.models import Auth, User
 from neptulon.utils import need_login, login_user
 
@@ -66,6 +69,49 @@ def password():
         return render_template('/password.html')
 
     g.user.set_password(password)
+    return redirect(url_for('ui.index'))
+
+
+@bp.route('/forget_password', methods=['POST', 'GET'])
+def forget_password():
+    if request.method == 'GET':
+        return render_template('/forget_password.html', email='')
+
+    email = request.form['email']
+    user = User.get_by_email(email)
+    if not user:
+        flash(u'没这个人啊', 'error')
+        return render_template('/forget_password.html', email='')
+
+    message = Message(
+                subject=u'重置内网 OPENID 密码',
+                sender=MAIL_USERNAME,
+                recipients=[email]
+            )
+    message.html = render_template('/email/reset_password.html', user=user)
+    mail.send(message)
+    return render_template('/forget_password.html', email=email)
+
+
+@bp.route('/reset_password/<token>', methods=['POST', 'GET'])
+def reset_password(token):
+    user = User.get_by_token(token)
+    if not user:
+        flash(u'没有这个人啊', 'error')
+        return render_template('/reset_password.html', token=token)
+
+    if request.method == 'GET':
+        return render_template('/reset_password.html', token=token)
+
+    password = request.form['password']
+    confirm_password = request.form['confirm_password']
+    if password != confirm_password:
+        flash(u'两次输入不对, 你是鱼么这么快就忘记了', 'error')
+        return render_template('/reset_password.html', token=token)
+
+    user.set_password(password)
+    user.refresh_token()
+    login_user(user)
     return redirect(url_for('ui.index'))
 
 
