@@ -19,6 +19,10 @@ class Base(db.Model):
     __abstract__ = True
 
     @declared_attr
+    def __tablename__(cls):
+        return cls.__name__.lower()
+
+    @declared_attr
     def id(cls):
         return db.Column('id', db.Integer, primary_key=True, autoincrement=True)
 
@@ -32,8 +36,6 @@ class Base(db.Model):
 
 
 class User(Base):
-
-    __tablename__ = 'user'
 
     name = db.Column(db.String(255), unique=True, nullable=False, default='')
     email = db.Column(db.String(255), unique=True, nullable=False, default='')
@@ -119,7 +121,6 @@ class User(Base):
 
 class Auth(Base):
 
-    __tablename__ = 'auth'
     __table_args__ = (
         db.UniqueConstraint('user_id', 'url'),
     )
