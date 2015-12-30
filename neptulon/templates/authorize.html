@@ -1,0 +1,39 @@
+{% extends "/base.html" %}
+
+{% block main %}
+<div class="col-md-3"></div>
+<div class="col-md-6">
+  <h3>{{ client.name }}</h3>
+  <p>请求获取你的身份信息</p>
+  <button class="btn btn-primary btn-small">给丫的</button>
+  <button class="btn btn-warning btn-small">去死吧</button>
+
+  <form action="{{ url_for('oauth.authorize') }}" method="POST">
+    <input name="client_id" type="hidden" value="{{ client.client_id }}">
+    <input name="scope" type="hidden" value="{{ scopes|join(' ') }}">
+    <input name="response_type" type="hidden" value="{{ response_type }}">
+    <input name="redirect_uri" type="hidden" value="{{ redirect_uri }}">
+    {% if state %}
+    <input name="state" type="hidden" value="{{ state }}">
+    {% endif %}
+    <input name="agree" type="text" value="">
+  </form>
+</div>
+{% endblock %}
+
+{% block more_css %}
+form {display: none;}
+.login-div {position: relative; padding: 38px 38px 267px; margin-bottom: 77px; color: #fff;}
+{% endblock %}
+
+{% block bottom_script %}
+<script>
+  $('.btn').click(function (){
+    var self = $(this);
+    if (self.hasClass('btn-primary')) {
+      $('input[name=agree]').val('1');
+    }
+    $('form').submit();
+  });
+</script>
+{% endblock %}

@@ -2,33 +2,10 @@
 
 import datetime
 import sqlalchemy.exc
-from sqlalchemy.ext.declarative import declared_attr
 from werkzeug.security import gen_salt, generate_password_hash, check_password_hash
 
-from .ext import db
-
-
-def _utf8(s):
-    if isinstance(s, unicode):
-        return s.encode('utf-8')
-    return s
-
-
-class Base(db.Model):
-
-    __abstract__ = True
-
-    @declared_attr
-    def id(cls):
-        return db.Column('id', db.Integer, primary_key=True, autoincrement=True)
-
-    @classmethod
-    def get(cls, id):
-        return cls.query.filter(cls.id == id).first()
-
-    @classmethod
-    def get_multi(cls, ids):
-        return [cls.get(i) for i in ids]
+from neptulon.ext import db
+from neptulon.models.base import Base
 
 
 class User(Base):

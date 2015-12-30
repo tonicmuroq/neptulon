@@ -8,13 +8,14 @@ from werkzeug.utils import import_string
 from neptulon.models import User
 from neptulon.utils import paginator_kwargs
 
-from .ext import db, mail
+from .ext import db, mail, oauth
 
 blueprints = [
     'ui',
     'auth',
     'index',
     'admin',
+    'oauth',
 ]
 
 def create_app():
@@ -26,6 +27,7 @@ def create_app():
 
     db.init_app(app)
     mail.init_app(app)
+    oauth.init_app(app)
 
     for bp in blueprints:
         import_name = '%s.views.%s:bp' % (__package__, bp)
