@@ -10,8 +10,6 @@ from neptulon.models.base import Base
 
 class User(Base):
 
-    __tablename__ = 'user'
-
     name = db.Column(db.String(255), unique=True, nullable=False, default='')
     email = db.Column(db.String(255), unique=True, nullable=False, default='')
     real_name = db.Column(db.String(255), unique=True, nullable=False, default='')
@@ -96,7 +94,6 @@ class User(Base):
 
 class Auth(Base):
 
-    __tablename__ = 'auth'
     __table_args__ = (
         db.UniqueConstraint('user_id', 'url'),
     )
