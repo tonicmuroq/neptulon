@@ -1,0 +1,24 @@
+{% extends "/base.html" %}
+
+{% block main %}
+  <ul class="list-group">
+    {% for token in tokens %}
+    <li class="list-group-item"> {{ token.client.name }}
+      <a class="btn btn-xs btn-warning pull-right" data-token="{{ token.id }}">嫑了</a>
+    </li>
+    {% else %}
+    什么都妹有
+    {% endfor %}
+  </ul>
+{% endblock %}
+
+{% block bottom_script %}
+<script>
+  $('.btn').click(function (){
+    var self = $(this);
+    $.post('/oauth/delete_token', {token: self.data('token')}, function (){
+      self.parent().remove();
+    });
+  });
+</script>
+{% endblock %}

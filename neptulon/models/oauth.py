@@ -34,6 +34,11 @@ class Client(Base):
     def get_by_client_id(cls, client_id):
         return cls.query.filter_by(client_id=client_id).first()
 
+    @classmethod
+    def get_all(cls, start=0, limit=20):
+        q = cls.query.order_by(cls.id.desc())
+        return q[start:start+limit]
+
     @property
     def client_type(self):
         return 'public'
@@ -54,9 +59,9 @@ class Client(Base):
     def default_redirect_uri(self):
         return self.redirect_uris[0]
 
-    @property
-    def user(self):
-        return User.get(self.user_id)
+    def delete(self):
+        Token.delete_by_client(self.client_id)
+        super(Client, self).delete()
 
 
 class Grant(Base):
@@ -99,22 +104,21 @@ class Grant(Base):
 
     @property
     def client(self):
-        return Client.get(self.client_id)
+        return Client.get_by_client_id(self.client_id)
 
     @property
     def user(self):
         return User.get(self.user_id)
 
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-
 
 class Token(Base):
 
     __tablename__ = 'token'
+    __table_args__ = (
+        db.Index('user_client', 'user_id', 'client_id'),
+    )
 
-    client_id = db.Column(db.String(40))
+    client_id = db.Column(db.String(40), index=True)
     user_id = db.Column(db.Integer)
     token_type = db.Column(db.String(40))
 
@@ -147,8 +151,18 @@ class Token(Base):
         return cls.query.filter_by(refresh_token=refresh_token).first()
 
     @classmethod
+    def get_by_user(cls, user_id, start=0, limit=20):
+        q = cls.query.filter_by(user_id=user_id)
+        return q[start:start+limit]
+
+    @classmethod
     def delete_by_client_and_user(cls, client_id, user_id):
-        cls.query.filter_by(client_id=client_id, user_id=user_id).delete()
+        cls.query.filter_by(user_id=user_id, client_id=client_id).delete()
+        db.session.commit()
+
+    @classmethod
+    def delete_by_client(cls, client_id):
+        cls.query.filter_by(client_id=client_id).delete()
         db.session.commit()
 
     @property
@@ -160,3 +174,7 @@ class Token(Base):
     @property
     def user(self):
         return User.get(self.user_id)
+
+    @property
+    def client(self):
+        return Client.get_by_client_id(self.client_id)

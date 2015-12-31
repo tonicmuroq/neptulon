@@ -1,29 +1,50 @@
 {% extends "/base.html" %}
 
 {% block main %}
-    <div class="login-form">
-      <form action="{{ url_for('oauth.client') }}" method="POST">
-        <div class="form-group">
-          <input name="redirect_uri" class="form-control login-field" type="text" placeholder="redirect uri">
-          <label class="login-field-icon fui-user" for=""></label>
-        </div>
-        <div class="form-group">
-          <input name="name" class="form-control login-field" type="text" placeholder="name">
-          <label class="login-field-icon fui-tag" for=""></label>
-        </div>
-
-        {% with errors = get_flashed_messages(category_filter=['error'])%}
-        {% if errors %}
-        <div class="form-group">
-          {% for error in errors %}
-          <label class="text-danger">
-            <span class="fui-cross-circle"></span> {{ error }}
-          </label>
-          {% endfor %}
-        </div>
-        {% endif %}
-        {% endwith %}
-        <button class="btn btn-primary btn-lg btn-block" type="submit">Go!</button>
-      </form>
+<ul class="list-group">
+  {% for client in clients %}
+  <li class="list-group-item">{{ client.name }}
+    <a class="btn btn-xs btn-warning pull-right" data-client-id="{{ client.id }}">嫑了</a>
+  </li>
+  {% endfor %}
+</ul>
+<div class="login-form">
+  <form action="{{ url_for('oauth.client') }}" method="POST">
+    <div class="form-group">
+      <input name="redirect_uri" class="form-control login-field" type="text" placeholder="redirect uri">
+      <label class="login-field-icon fui-user" for=""></label>
     </div>
+    <div class="form-group">
+      <input name="name" class="form-control login-field" type="text" placeholder="name">
+      <label class="login-field-icon fui-tag" for=""></label>
+    </div>
+
+    {% with errors = get_flashed_messages(category_filter=['error'])%}
+    {% if errors %}
+    <div class="form-group">
+      {% for error in errors %}
+      <label class="text-danger">
+        <span class="fui-cross-circle"></span> {{ error }}
+      </label>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+    <button class="btn btn-primary btn-lg btn-block" type="submit">Go!</button>
+  </form>
+</div>
+{% endblock %}
+
+{% block bottom_script %}
+<script>
+  $('.btn-xs').click(function (){
+    if (!confirm('确认要删除么?')) {
+      return;
+    }
+    var self = $(this);
+    $.post('/oauth/delete_client', {client: self.data('client-id')}, function (){
+      self.parent().remove();
+    });
+  });
+</script>
 {% endblock %}

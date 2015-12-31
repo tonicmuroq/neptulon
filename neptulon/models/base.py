@@ -18,3 +18,7 @@ class Base(db.Model):
     @classmethod
     def get_multi(cls, ids):
         return [cls.get(i) for i in ids]
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
