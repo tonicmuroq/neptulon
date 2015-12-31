@@ -9,8 +9,6 @@ from neptulon.models.user import User
 
 class Client(Base):
 
-    __tablename__ = 'client'
-
     name = db.Column(db.String(255))
     client_id = db.Column(db.String(40), index=True)
     client_secret = db.Column(db.String(60))
@@ -66,7 +64,6 @@ class Client(Base):
 
 class Grant(Base):
 
-    __tablename__ = 'grant'
     __table_args__ = (
         db.Index('code_client', 'code', 'client_id'),
     )
@@ -113,7 +110,6 @@ class Grant(Base):
 
 class Token(Base):
 
-    __tablename__ = 'token'
     __table_args__ = (
         db.Index('user_client', 'user_id', 'client_id'),
     )

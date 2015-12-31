@@ -11,6 +11,10 @@ class Base(db.Model):
     def id(cls):
         return db.Column('id', db.Integer, primary_key=True, autoincrement=True)
 
+    @declared_attr
+    def __tablename__(cls):
+        return cls.__name__.lower()
+
     @classmethod
     def get(cls, id):
         return cls.query.filter(cls.id == id).first()
