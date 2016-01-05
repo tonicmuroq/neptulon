@@ -120,7 +120,10 @@ def authorized_tokens():
 @oauth.require_oauth()
 def me():
     user = request.oauth.user
-    return jsonify(name=user.name,
+    return jsonify(
+            id=user.id,
+            name=user.name,
             email=user.email,
             real_name=user.real_name,
-            token=user.token)
+            token=user.token,
+    )

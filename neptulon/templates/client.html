@@ -1,13 +1,26 @@
 {% extends "/base.html" %}
 
 {% block main %}
-<ul class="list-group">
-  {% for client in clients %}
-  <li class="list-group-item">{{ client.name }}
-    <a class="btn btn-xs btn-warning pull-right" data-client-id="{{ client.id }}">嫑了</a>
-  </li>
-  {% endfor %}
-</ul>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <td>AppName</td>
+      <td>ClientID</td>
+      <td>ClientSecret</td>
+      <td>Ops</td>
+    </tr>
+  </thead>
+  <tbody>
+      {% for client in clients %}
+      <tr>
+          <td>{{ client.name }}</td>
+          <td>{{ client.client_id }}</td>
+          <td>{{ client.client_secret }}</td>
+          <td><a id="delete" class="btn btn-xs btn-warning" data-client-id="{{ client.id }}">嫑了</a></td>
+      </tr>
+      {% endfor %}
+  </tbody>
+</table>
 <div class="login-form">
   <form action="{{ url_for('oauth.client') }}" method="POST">
     <div class="form-group">
@@ -37,13 +50,13 @@
 
 {% block bottom_script %}
 <script>
-  $('.btn-xs').click(function (){
+  $('a#delete').click(function (){
     if (!confirm('确认要删除么?')) {
       return;
     }
     var self = $(this);
     $.post('/oauth/delete_client', {client: self.data('client-id')}, function (){
-      self.parent().remove();
+      self.parent().parent().remove();
     });
   });
 </script>
