@@ -31,7 +31,7 @@ def hook_readline_hist():
     atexit.register(savehist)
 
 def get_banner():
-    return 'Ponerine shell.\n'
+    return 'Neptulon shell.\n'
 
 def pre_imports():
     from neptulon.ext import db, mail

@@ -121,9 +121,10 @@ def authorized_tokens():
 def me():
     user = request.oauth.user
     return jsonify(
-            id=user.id,
-            name=user.name,
-            email=user.email,
-            real_name=user.real_name,
-            token=user.token,
+        id=user.id,
+        name=user.name,
+        email=user.email,
+        real_name=user.real_name,
+        token=user.token,
+        privilege=user.privilege,
     )
