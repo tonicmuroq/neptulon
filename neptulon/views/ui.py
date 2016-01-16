@@ -1,13 +1,17 @@
 # coding: utf-8
 
-from flask import Blueprint, request, g, redirect, url_for, session, render_template, flash, jsonify
+from flask import Blueprint, request, g, redirect, url_for, session, render_template, flash, jsonify, make_response, render_template_string
 from flask.ext.mail import Message
 
 from neptulon.ext import mail
-from neptulon.config import MAIL_USERNAME
-from neptulon.models import Auth, User
-from neptulon.utils import need_login, login_user
+from neptulon.config import MAIL_USERNAME, rdb
+from neptulon.models import Auth, User, Pubkey
+from neptulon.utils import need_login, login_user, gen_fingerprint, list_keys_by_userid, get_key_by_userid, delete_key_by_userid, add_key, get_key
 
+import sys
+
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 bp = Blueprint('ui', __name__, url_prefix='/ui')
 
@@ -16,7 +20,9 @@ bp = Blueprint('ui', __name__, url_prefix='/ui')
 @need_login
 def index():
     auths = g.user.get_auths()
-    return render_template('/auths.html', auths=auths)
+    name  = session['name']
+    user = User.get_by_name(name)
+    return render_template('/auths.html', auths=auths, user=user)
 
 
 @bp.route('/delete_auth', methods=['POST'])
@@ -31,6 +37,39 @@ def delete_auth():
     auth.delete()
     return jsonify({'message': 'ok'}), 200
 
+@bp.route('/refresh_token', methods=['POST'])
+@need_login
+def refresh_token():
+    user_id = request.form['user_id']
+    user = User.get(user_id)
+    
+    pubkeys = list_keys_by_userid(user_id)
+    print(pubkeys)
+    for key in pubkeys:
+        delete_key_by_userid(user_id, key['fingerprint'])
+    token = user.refresh_token()
+    return jsonify({'message': user.token}), 200
+
+
+@bp.route('/download_config', methods=['GET'])
+@need_login
+def download_config():
+    #user_id = request.form['user_id']
+    user = User.get(session['id'])
+    resp = make_response()
+    resp.headers['Content-Type'] = "application/octet-stream"
+    resp.headers['Pragma'] = "No-cache"
+    resp.headers['Cache-Control'] = "No-cache"
+    resp.headers['Content-Disposition'] = "attachment; filename='ricebook-mobile.config'"
+    f = open('./ricebook-template.mobileconfig', 'rb')
+    try:
+        temp = f.read()
+    finally:
+        f.close()
+
+    temp = render_template_string(temp, username=user.name, password=user.token)
+    resp.data = temp
+    return resp
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -70,6 +109,41 @@ def password():
 
     g.user.set_password(password)
     return redirect(url_for('ui.index'))
+
+@bp.route('/pubkey', methods=['GET'])
+@need_login
+def pubkeys():
+    pubkeys = list_keys_by_userid(session['id'])
+    return render_template('/pubkeys.html', pubkeys=pubkeys)
+
+
+@bp.route('/add_pubkey', methods=['GET', 'POST'])
+@need_login
+def add_pubkey():
+    if request.method == 'GET':
+        return render_template('/add_pubkey.html')
+
+    title = request.form['title']
+    pkey = request.form['pkey']
+
+    ret = get_key(session['id'], pkey, title)
+    if ret:
+        flash(u'重复啦', 'error')
+        return render_template('/add_pubkey.html')
+
+    ret = add_key(session['id'], pkey, title)
+    return redirect(url_for('ui.pubkeys'))
+
+@bp.route('/delete_pubkey', methods=['POST'])
+@need_login
+def delete_pubkey():
+    keyfp = request.form['keyfp']
+    pubkey = get_key_by_userid(session['id'], keyfp)
+    if pubkey:
+        delete_key_by_userid(session['id'], keyfp)
+    else:
+        return jsonify({'message': 'pub key does not exist'}), 200
+    return jsonify({'message': 'ok'}), 200
 
 
 @bp.route('/forget_password', methods=['POST', 'GET'])

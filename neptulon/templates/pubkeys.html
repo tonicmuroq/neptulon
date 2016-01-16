@@ -1,0 +1,42 @@
+{% extends "/base.html" %}
+
+
+{% block more_content_header %}
+ <a class="btn btn-xs btn-info pull-left" href="/ui/add_pubkey">增加一枚</a> 
+{% endblock %}
+
+{% block main %}
+
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <td>Fingerprint</td>
+        <td>Title</td>
+        <td>Ops</td>
+      </tr>
+    </thead>
+    <tbody>
+      {% for key in pubkeys %}
+        <tr>
+            <td>{{ key.fingerprint}}</td>
+            <td>{{ key.title }}</td>
+            <td>
+                <a id="delete" class="pkeybtn btn btn-xs btn-warning" data-keyfp="{{ key.fingerprint }}">嫑了</a>
+            </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
+
+{% block bottom_script %}
+<script>
+  $('.pkeybtn').click(function (){
+    var self = $(this);
+    $.post('/ui/delete_pubkey', {keyfp: self.data('keyfp')}, function (){
+      self.parent().remove();
+      location.reload();
+    });
+  });
+</script>
+{% endblock %}

@@ -1,6 +1,7 @@
 # coding: utf-8
 
 import os
+import redis
 
 DEBUG = True
 
@@ -13,6 +14,10 @@ MYSQL_DATABASE = os.getenv('MYSQL_DATABASE', 'neptulon')
 SQLALCHEMY_POOL_SIZE = 100
 SQLALCHEMY_POOL_TIMEOUT = 10
 SQLALCHEMY_POOL_RECYCLE = 2000
+
+REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
+REDIS_PORT = int(os.getenv('REDIS_PORT', '6379'))
+REDIS_DB = int(os.getenv('REDIS_DB', '0'))
 
 SECRET_KEY = os.getenv('SECRET_KEY', '69wolegeca')
 SERVER_PORT = int(os.getenv('SERVER_PORT', '5000'))
@@ -33,3 +38,6 @@ except ImportError:
 SQLALCHEMY_DATABASE_URI = 'mysql://{0}:{1}@{2}:{3}/{4}'.format(
     MYSQL_USER, MYSQL_PASSWORD, MYSQL_HOST, MYSQL_PORT, MYSQL_DATABASE,
 )
+
+redisPool = redis.ConnectionPool(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
+rdb = redis.Redis(connection_pool=redisPool)

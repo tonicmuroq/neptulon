@@ -14,7 +14,7 @@ class User(Base):
     email = db.Column(db.String(255), unique=True, nullable=False, default='')
     real_name = db.Column(db.String(255), unique=True, nullable=False, default='')
     password = db.Column(db.String(255), nullable=False, default='')
-    token = db.Column(db.String(64), default=lambda: gen_salt(64), index=True)
+    token = db.Column(db.String(5), default=lambda: gen_salt(5), index=True)
     privilege = db.Column(db.Integer, default=0)
     time = db.Column(db.DateTime, default=datetime.datetime.now)
 
@@ -69,7 +69,7 @@ class User(Base):
         db.session.commit()
 
     def refresh_token(self):
-        self.token = gen_salt(64)
+        self.token = gen_salt(5)
         db.session.add(self)
         db.session.commit()
 
