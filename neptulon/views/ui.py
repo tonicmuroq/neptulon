@@ -2,7 +2,7 @@
 
 from flask import Blueprint, request, g, redirect, url_for, session, render_template, flash, jsonify, make_response, render_template_string
 from flask.ext.mail import Message
-from neptulon.ext import mail, rdb
+from neptulon.ext import mail
 from neptulon.config import MAIL_USERNAME
 from neptulon.models import Auth, User, RSAKey
 from neptulon.utils import need_login, login_user, gen_fingerprint
@@ -46,19 +46,11 @@ def refresh_token():
 @bp.route('/download_config', methods=['GET'])
 @need_login
 def download_config():
-    resp = make_response()
+    resp = make_response(render_template('/ricebook-template.mobileconfig', username=g.user.name, password=g.user.token))
     resp.headers['Content-Type'] = "application/octet-stream"
     resp.headers['Pragma'] = "No-cache"
     resp.headers['Cache-Control'] = "No-cache"
     resp.headers['Content-Disposition'] = "attachment; filename='ricebook-mobile.config'"
-    f = open('./ricebook-template.mobileconfig', 'rb')
-    try:
-        temp = f.read()
-    finally:
-        f.close()
-
-    temp = render_template_string(temp, username=g.user.name, password=g.user.token)
-    resp.data = temp
     return resp
 
 

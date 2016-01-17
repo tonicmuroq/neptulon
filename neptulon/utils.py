@@ -3,7 +3,6 @@
 from functools import wraps
 from flask import g, redirect, url_for, session, request, flash, render_template
 from neptulon.models import User
-from neptulon.ext import rdb
 import hashlib
 import base64
 
