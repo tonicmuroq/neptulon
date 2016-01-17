@@ -6,10 +6,7 @@ from neptulon.ext import mail
 from neptulon.config import MAIL_USERNAME
 from neptulon.models import Auth, User, RSAKey
 from neptulon.utils import need_login, login_user, gen_fingerprint
-import sys
 
-reload(sys)
-sys.setdefaultencoding('utf8')
 bp = Blueprint('ui', __name__, url_prefix='/ui')
 
 @bp.route('/', methods=['GET'])
