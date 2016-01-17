@@ -2,8 +2,8 @@
 
 from flask import Blueprint, request, redirect, url_for, render_template, flash, jsonify, abort, g
 
-from neptulon.utils import need_admin, list_keys_by_userid, delete_key_by_userid
-from neptulon.models import User
+from neptulon.utils import need_admin
+from neptulon.models import User, RSAKey
 
 bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -66,9 +66,9 @@ def delete_user():
     if not user:
         return jsonify({'message': 'not found'}), 404
 
-    pubkeys = list_keys_by_userid(user_id)
-    for key in pubkeys:
-        delete_key_by_userid(user_id, key['fingerprint'])
+    pubkey = RSAKey.get_by_userid(user_id)
+    if pubkey:
+        pubkey.delete()
     user.delete()
 
     return jsonify({'message': 'ok'}), 200
@@ -86,6 +86,6 @@ def sudo():
 
 
 @bp.before_request
-#@need_admin
+@need_admin
 def access_control():
     pass

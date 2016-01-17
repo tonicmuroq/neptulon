@@ -2,27 +2,21 @@
 
 from flask import Blueprint, request, g, redirect, url_for, session, render_template, flash, jsonify, make_response, render_template_string
 from flask.ext.mail import Message
-
-from neptulon.ext import mail
-from neptulon.config import MAIL_USERNAME, rdb
-from neptulon.models import Auth, User, Pubkey
-from neptulon.utils import need_login, login_user, gen_fingerprint, list_keys_by_userid, get_key_by_userid, delete_key_by_userid, add_key, get_key
-
+from neptulon.ext import mail, rdb
+from neptulon.config import MAIL_USERNAME
+from neptulon.models import Auth, User, RSAKey
+from neptulon.utils import need_login, login_user, gen_fingerprint
 import sys
 
 reload(sys)
 sys.setdefaultencoding('utf8')
-
 bp = Blueprint('ui', __name__, url_prefix='/ui')
-
 
 @bp.route('/', methods=['GET'])
 @need_login
 def index():
     auths = g.user.get_auths()
-    name  = session['name']
-    user = User.get_by_name(name)
-    return render_template('/auths.html', auths=auths, user=user)
+    return render_template('/auths.html', auths=auths, user=g.user)
 
 
 @bp.route('/delete_auth', methods=['POST'])
@@ -37,16 +31,14 @@ def delete_auth():
     auth.delete()
     return jsonify({'message': 'ok'}), 200
 
+
 @bp.route('/refresh_token', methods=['POST'])
 @need_login
 def refresh_token():
-    user_id = request.form['user_id']
-    user = User.get(user_id)
-    
-    pubkeys = list_keys_by_userid(user_id)
-    print(pubkeys)
-    for key in pubkeys:
-        delete_key_by_userid(user_id, key['fingerprint'])
+    user = g.user
+    pubkey = RSAKey.get_by_userid(user.id)
+    if pubkey:
+        pubkey.delete()
     token = user.refresh_token()
     return jsonify({'message': user.token}), 200
 
@@ -54,8 +46,6 @@ def refresh_token():
 @bp.route('/download_config', methods=['GET'])
 @need_login
 def download_config():
-    #user_id = request.form['user_id']
-    user = User.get(session['id'])
     resp = make_response()
     resp.headers['Content-Type'] = "application/octet-stream"
     resp.headers['Pragma'] = "No-cache"
@@ -67,9 +57,10 @@ def download_config():
     finally:
         f.close()
 
-    temp = render_template_string(temp, username=user.name, password=user.token)
+    temp = render_template_string(temp, username=g.user.name, password=g.user.token)
     resp.data = temp
     return resp
+
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -110,10 +101,14 @@ def password():
     g.user.set_password(password)
     return redirect(url_for('ui.index'))
 
+
 @bp.route('/pubkey', methods=['GET'])
 @need_login
 def pubkeys():
-    pubkeys = list_keys_by_userid(session['id'])
+    pubkey = RSAKey.get_by_userid(g.user.id)
+    pubkeys = []
+    if pubkey:
+        pubkeys.append(pubkey)
     return render_template('/pubkeys.html', pubkeys=pubkeys)
 
 
@@ -126,21 +121,22 @@ def add_pubkey():
     title = request.form['title']
     pkey = request.form['pkey']
 
-    ret = get_key(session['id'], pkey, title)
-    if ret:
-        flash(u'重复啦', 'error')
+    fingerprint = gen_fingerprint(pkey)
+    pubkey = RSAKey.get_by_userid(g.user.id)
+    if pubkey:
+        flash(u'已经存在一枚key了，只能添加一枚哦', 'error')
         return render_template('/add_pubkey.html')
 
-    ret = add_key(session['id'], pkey, title)
+    ret = RSAKey.create(g.user.id, title, pkey)
     return redirect(url_for('ui.pubkeys'))
 
 @bp.route('/delete_pubkey', methods=['POST'])
 @need_login
 def delete_pubkey():
     keyfp = request.form['keyfp']
-    pubkey = get_key_by_userid(session['id'], keyfp)
+    pubkey = RSAKey.get_by_fingerprint(keyfp)
     if pubkey:
-        delete_key_by_userid(session['id'], keyfp)
+        pubkey.delete()
     else:
         return jsonify({'message': 'pub key does not exist'}), 200
     return jsonify({'message': 'ok'}), 200

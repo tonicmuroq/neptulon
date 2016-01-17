@@ -24,6 +24,8 @@
                 <a id="delete" class="pkeybtn btn btn-xs btn-warning" data-keyfp="{{ key.fingerprint }}">嫑了</a>
             </td>
         </tr>
+      {% else %}
+        <tr> <td colspan="3">什么都没有</td> </tr>
       {% endfor %}
     </tbody>
   </table>

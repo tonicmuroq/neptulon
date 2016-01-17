@@ -2,7 +2,7 @@
 
 from .user import User, Auth
 from .oauth import Client, Grant, Token
-from .pubkey import Pubkey
+from .pubkey import RSAKey
 
 
-__all__ = ['User', 'Auth', 'Client', 'Grant', 'Token', 'Pubkey']
+__all__ = ['User', 'Auth', 'Client', 'Grant', 'Token', 'RSAKey']
