@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from flask import Blueprint, request, jsonify, g, redirect, render_template, url_for, flash
 
 from neptulon.ext import oauth
-from neptulon.models import Grant, Token, Client
+from neptulon.models import Grant, Token, Client, User
 from neptulon.utils import need_login, need_admin
 
 bp = Blueprint('oauth', __name__, url_prefix='/oauth')
@@ -127,4 +127,25 @@ def me():
         real_name=user.real_name,
         token=user.token,
         privilege=user.privilege,
+    )
+
+
+@bp.route('/api/user/<user_id>')
+@oauth.require_oauth()
+def get_user(user_id):
+    user = request.oauth.user
+    if not user.privilege and user.id != user_id:
+        return jsonify({}), 403
+
+    u = User.get(user_id)
+    if not u:
+        return jsonify({}), 404
+
+    return jsonify(
+        id=u.id,
+        name=u.name,
+        email=u.email,
+        real_name=u.real_name,
+        token=u.token,
+        privilege=u.privilege,
     )
