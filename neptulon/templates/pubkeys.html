@@ -40,9 +40,19 @@
 	<a class="genbtn btn-xs btn-warning" href="#">更新 token</a> 
 </div>
 
-<div class="col-md-8 col-md-offset-2">
+<div class="col-md-8 col-md-offset-2 line-bottom">
   <p>移动端 VPN 证书下载</p>
   <a class="btn-xs btn-info" href="{{ url_for('ui.download_config') }}" target="_blank">点我下载证书</a> 
+</div>
+
+<div class="col-md-8 col-md-offset-2 line-bottom">
+  <p>Android操作系统下载方法</p>
+  <ol>
+    <li>选择添加vpn连接，类型选择IPSec Xauth PSK </li>
+    <li>地址为vpn.ricebook.net </li>
+    <li>identifier留空</li>
+    <li>密码为ipsec</li>
+  </ol>
 </div>
 {% endblock %}
 
