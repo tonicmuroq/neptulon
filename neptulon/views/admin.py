@@ -1,6 +1,9 @@
 # coding:utf-8
 
 from flask import Blueprint, request, redirect, url_for, render_template, flash, jsonify, abort, g
+from flask.ext.mail import Message
+from neptulon.ext import mail
+from neptulon.config import MAIL_USERNAME
 
 from neptulon.utils import need_admin
 from neptulon.models import User, RSAKey
@@ -56,6 +59,13 @@ def register():
         flash(u'已经存在, 登录去吧', 'error')
         return render_template('/register.html')
 
+    message = Message(
+                subject=u'用户注册成功',
+                sender=MAIL_USERNAME,
+                recipients=[email]
+            )
+    message.html = render_template('/email/register_success.html', user=u, password=password)
+    mail.send(message)
     return redirect(url_for('admin.index'))
 
 
