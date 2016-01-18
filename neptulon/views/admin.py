@@ -76,7 +76,7 @@ def delete_user():
     if not user:
         return jsonify({'message': 'not found'}), 404
 
-    pubkey = RSAKey.get_by_userid(user_id)
+    pubkey = RSAKey.get_by_user_id(user_id)
     if pubkey:
         pubkey.delete()
     user.delete()
