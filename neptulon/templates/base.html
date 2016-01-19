@@ -34,6 +34,9 @@
           <li class="{{ 'active' if request.path == url_for('oauth.authorized_tokens') else '' }}">
             <a href="{{ url_for('oauth.authorized_tokens') }}"><span class="fui-list-numbered"></span> OAuth2 授权列表</a>
           </li>
+          <li class="{{ 'active' if request.path == url_for('ui.pubkeys') else '' }}">
+            <a href="{{ url_for('ui.pubkeys') }}"><span class="fui-list-bulleted"></span>Pub keys列表</a>
+          </li>
           {% if g.user and g.user.privilege %}
           <li class="{{ 'active' if request.path == url_for('admin.index') else '' }}">
             <a href="{{ url_for('admin.index') }}"><span class="fui-user"></span> 老子要管人</a>

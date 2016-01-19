@@ -1,22 +1,19 @@
 # coding: utf-8
 
-from flask import Blueprint, request, g, redirect, url_for, session, render_template, flash, jsonify
+from flask import Blueprint, request, g, redirect, url_for, session, render_template, flash, jsonify, make_response, render_template_string
 from flask.ext.mail import Message
-
 from neptulon.ext import mail
 from neptulon.config import MAIL_USERNAME
-from neptulon.models import Auth, User
-from neptulon.utils import need_login, login_user
-
+from neptulon.models import Auth, User, RSAKey
+from neptulon.utils import need_login, login_user, gen_fingerprint
 
 bp = Blueprint('ui', __name__, url_prefix='/ui')
-
 
 @bp.route('/', methods=['GET'])
 @need_login
 def index():
     auths = g.user.get_auths()
-    return render_template('/auths.html', auths=auths)
+    return render_template('/auths.html', auths=auths, user=g.user)
 
 
 @bp.route('/delete_auth', methods=['POST'])
@@ -30,6 +27,28 @@ def delete_auth():
         return jsonify({'message': 'not allowed'}), 403
     auth.delete()
     return jsonify({'message': 'ok'}), 200
+
+
+@bp.route('/refresh_token', methods=['POST'])
+@need_login
+def refresh_token():
+    user = g.user
+    pubkey = RSAKey.get_by_userid(user.id)
+    if pubkey:
+        pubkey.delete()
+    token = user.refresh_token()
+    return jsonify({'message': user.token}), 200
+
+
+@bp.route('/download_config', methods=['GET'])
+@need_login
+def download_config():
+    resp = make_response(render_template('/ricebook-template.mobileconfig', username=g.user.name, password=g.user.token))
+    resp.headers['Content-Type'] = "application/octet-stream"
+    resp.headers['Pragma'] = "No-cache"
+    resp.headers['Cache-Control'] = "No-cache"
+    resp.headers['Content-Disposition'] = "attachment; filename='ricebook-mobile.config'"
+    return resp
 
 
 @bp.route('/login', methods=['GET', 'POST'])
@@ -70,6 +89,46 @@ def password():
 
     g.user.set_password(password)
     return redirect(url_for('ui.index'))
+
+
+@bp.route('/pubkey', methods=['GET'])
+@need_login
+def pubkeys():
+    pubkey = RSAKey.get_by_userid(g.user.id)
+    pubkeys = []
+    if pubkey:
+        pubkeys.append(pubkey)
+    return render_template('/pubkeys.html', pubkeys=pubkeys)
+
+
+@bp.route('/add_pubkey', methods=['GET', 'POST'])
+@need_login
+def add_pubkey():
+    if request.method == 'GET':
+        return render_template('/add_pubkey.html')
+
+    title = request.form['title']
+    pkey = request.form['pkey']
+
+    fingerprint = gen_fingerprint(pkey)
+    pubkey = RSAKey.get_by_userid(g.user.id)
+    if pubkey:
+        flash(u'已经存在一枚key了，只能添加一枚哦', 'error')
+        return render_template('/add_pubkey.html')
+
+    ret = RSAKey.create(g.user.id, title, pkey)
+    return redirect(url_for('ui.pubkeys'))
+
+@bp.route('/delete_pubkey', methods=['POST'])
+@need_login
+def delete_pubkey():
+    keyfp = request.form['keyfp']
+    pubkey = RSAKey.get_by_fingerprint(keyfp)
+    if pubkey:
+        pubkey.delete()
+    else:
+        return jsonify({'message': 'pub key does not exist'}), 200
+    return jsonify({'message': 'ok'}), 200
 
 
 @bp.route('/forget_password', methods=['POST', 'GET'])

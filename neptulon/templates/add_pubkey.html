@@ -1,0 +1,26 @@
+{% extends "/base.html" %}
+
+{% block main %}
+    <div class="login-form">
+      <form action="{{ url_for('ui.add_pubkey') }}" method="POST">
+        <div class="form-group">
+          <input name="title" class="form-control login-field" type="text" placeholder="title">
+        </div>
+        <div class="form-group">
+          <textarea name="pkey" class="form-control login-field" col="40" row="30" placeholder="key"></textarea>
+        </div>
+        {% with errors = get_flashed_messages(category_filter=['error'])%}
+        {% if errors %}
+        <div class="form-group">
+          {% for error in errors %}
+          <label class="text-danger">
+            <span class="fui-cross-circle"></span> {{ error }}
+          </label>
+          {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+        <button class="btn btn-primary btn-lg btn-block" type="submit">Go!</button>
+      </form>
+    </div>
+{% endblock %}

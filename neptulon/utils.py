@@ -1,7 +1,10 @@
 # coding:utf-8
 
 from functools import wraps
-from flask import g, redirect, url_for, session, request
+from flask import g, redirect, url_for, session, request, flash, render_template
+from neptulon.models import User
+import hashlib
+import base64
 
 def need_login(f):
     @wraps(f)
@@ -23,6 +26,7 @@ def need_admin(f):
 
 def login_user(user):
     session['id'] = user.id
+    session['name'] = user.name
 
 
 def paginator_kwargs(kw):
@@ -30,3 +34,10 @@ def paginator_kwargs(kw):
     d.pop('start', None)
     d.pop('limit', None)
     return d
+
+
+def gen_fingerprint(line):
+    line = line.strip().split()
+    key = base64.b64decode(line[len(line)-2].encode('ascii'))
+    return hashlib.md5(key).hexdigest().upper()
+
