@@ -1,8 +1,9 @@
 # coding: utf-8
+
 import datetime
 import sqlalchemy.exc
+
 from neptulon.ext import db
-from neptulon.models import User
 from neptulon.utils import gen_fingerprint
 from neptulon.models.base import Base
 
@@ -10,15 +11,15 @@ class RSAKey(Base):
 
     user_id = db.Column(db.Integer, unique=True, nullable=False, index=True)
     title = db.Column(db.String(255), nullable=False)
-    rsa = db.Column(db.Text(2000), nullable=False)
+    rsa = db.Column(db.Text, nullable=False)
     fingerprint = db.Column(db.String(32), nullable=False)
     time = db.Column(db.DateTime, default=datetime.datetime.now)
     
     @classmethod
-    def create(cls, userid, title, rsa):
+    def create(cls, user_id, title, rsa):
         fingerprint = gen_fingerprint(rsa)
         try:
-            rsakey = cls(user_id=userid, title=title, rsa=rsa, fingerprint=fingerprint)
+            rsakey = cls(user_id=user_id, title=title, rsa=rsa, fingerprint=fingerprint)
             db.session.add(rsakey)
             db.session.commit()
             return rsakey
@@ -27,8 +28,8 @@ class RSAKey(Base):
             return None
 
     @classmethod
-    def get_by_userid(cls, userid):
-        return cls.query.filter_by(user_id=userid).first()
+    def get_by_user_id(cls, user_id):
+        return cls.query.filter_by(user_id=user_id).first()
 
     @classmethod
     def get_by_fingerprint(cls, fingerprint):

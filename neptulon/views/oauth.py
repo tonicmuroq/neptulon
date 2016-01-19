@@ -127,6 +127,7 @@ def me():
         real_name=user.real_name,
         token=user.token,
         privilege=user.privilege,
+        pubkey=user.pubkey,
     )
 
 
@@ -148,4 +149,5 @@ def get_user(user_id):
         real_name=u.real_name,
         token=u.token,
         privilege=u.privilege,
+        pubkey=user.pubkey,
     )

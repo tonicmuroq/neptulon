@@ -24,18 +24,12 @@
     <!-- Docs master nav -->
     <nav class="navbar navbar-inverse" role="navigation">
       <div class="navbar-header">
-          <a href="{{ url_for('ui.index') }}" class="navbar-brand">Neptulon</a>
+        <a href="{{ url_for('ui.index') }}" class="navbar-brand">Neptulon</a>
       </div>
       <div class="collapse navbar-collapse">
         <ul class="nav navbar-nav">
-          <li class="{{ 'active' if request.path == url_for('ui.index') else '' }}">
-            <a href="{{ url_for('ui.index') }}"><span class="fui-list-bulleted"></span> Token 授权列表</a>
-          </li>
           <li class="{{ 'active' if request.path == url_for('oauth.authorized_tokens') else '' }}">
             <a href="{{ url_for('oauth.authorized_tokens') }}"><span class="fui-list-numbered"></span> OAuth2 授权列表</a>
-          </li>
-          <li class="{{ 'active' if request.path == url_for('ui.pubkeys') else '' }}">
-            <a href="{{ url_for('ui.pubkeys') }}"><span class="fui-list-bulleted"></span>Pub keys列表</a>
           </li>
           {% if g.user and g.user.privilege %}
           <li class="{{ 'active' if request.path == url_for('admin.index') else '' }}">
@@ -54,44 +48,49 @@
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ g.user.name or '你谁啊' }} <b class="caret"></b></a>
             <ul class="dropdown-menu">
               {% if g.user %}
-                <li><a href="{{ url_for('ui.password') }}">改个密码</a></li>
-                {% if g.user.privilege %}
-                  <li><a href="{{ url_for('admin.index', admin=1) }}">Admin 管理</a></li>
-                {% endif %}
-                <li class="divider"></li>
-                <li><a href="{{ url_for('ui.logout') }}">再贱</a></li>
+              <li><a href="{{ url_for('ui.password') }}"><span class="fui-new"></span> 改个密码</a></li>
+              {% if g.user.privilege %}
+              <li class="divider"></li>
+              <li><a href="{{ url_for('admin.index', admin=1) }}"><span class="fui-gear"></span> Admin 管理</a></li>
+              {% endif %}
+              <li class="divider"></li>
+              <li class="{{ 'active' if request.path == url_for('ui.pubkeys') else '' }}">
+                <a href="{{ url_for('ui.pubkeys') }}"><span class="fui-clip"></span> Pub Key / Token</a>
+              </li>
+              <li class="divider"></li>
+              <li><a href="{{ url_for('ui.logout') }}"><span class="fui-power"></span> 再贱</a></li>
               {% else %}
-                <li><a href="{{ url_for('ui.login') }}">大爷来玩啊</a></li>
+              <li><a href="{{ url_for('ui.login') }}"><span class="fui-user"></span> 大爷来玩啊</a></li>
               {% endif %}
             </ul>
           </li>
         </ul>
-      <div>
-    </nav>
-    {% endblock %}
+        <div>
+        </nav>
+        {% endblock %}
 
-    <!-- Docs page layout -->
-    <div class="bs-header" id="content">
-      <div class="container">
-        {% block more_content_header %}{% endblock %}
-      </div>
-    </div>
+        <!-- Docs page layout -->
+        <div class="bs-header" id="content">
+          <div class="container">
+            {% block more_content_header %}{% endblock %}
+          </div>
+        </div>
 
-    <div class="container bs-docs-container">
-      <div class="row">
-      {% block main %}
-      {% endblock %}
-      </div>
-    </div>
+        <div class="container bs-docs-container">
+          <div class="row">
+            {% block main %}
+            {% endblock %}
+          </div>
+        </div>
 
-    <!-- Footer ================================================== -->
-    <footer class="footer container">
-        {% block footer %}{% endblock %}
-    </footer>
+        <!-- Footer ================================================== -->
+        <footer class="footer container">
+          {% block footer %}{% endblock %}
+        </footer>
 
-    <!-- Le javascript ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    {% block bottom_script %}{% endblock %}
-    <!-- COLLECTED JS -->
-  </body>
-</html>
+        <!-- Le javascript ================================================== -->
+        <!-- Placed at the end of the document so the pages load faster -->
+        {% block bottom_script %}{% endblock %}
+        <!-- COLLECTED JS -->
+      </body>
+    </html>

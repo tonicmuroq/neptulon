@@ -1,10 +1,10 @@
 # coding:utf-8
 
-from functools import wraps
-from flask import g, redirect, url_for, session, request, flash, render_template
-from neptulon.models import User
-import hashlib
 import base64
+import hashlib
+from functools import wraps
+from flask import g, redirect, url_for, session, request
+
 
 def need_login(f):
     @wraps(f)
@@ -40,4 +40,3 @@ def gen_fingerprint(line):
     line = line.strip().split()
     key = base64.b64decode(line[len(line)-2].encode('ascii'))
     return hashlib.md5(key).hexdigest().upper()
-

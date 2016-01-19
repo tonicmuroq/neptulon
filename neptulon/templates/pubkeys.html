@@ -1,44 +1,76 @@
 {% extends "/base.html" %}
 
-
-{% block more_content_header %}
- <a class="btn btn-xs btn-info pull-left" href="/ui/add_pubkey">增加一枚</a> 
+{% block more_css %}
+	.line-bottom {
+		border-bottom: 1px #ddd solid;
+		margin-bottom: 20px;
+		padding-bottom: 20px;
+	}
 {% endblock %}
 
 {% block main %}
+<div class="col-md-8 col-md-offset-2 line-bottom">
+	{% if pubkey %}
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<td>Fingerprint</td>
+				<td>Title</td>
+				<td>Ops</td>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>{{ pubkey.fingerprint }}</td>
+				<td>{{ pubkey.title }}</td>
+				<td>
+					<a id="delete" class="pkeybtn btn btn-xs btn-warning" data-keyfp="{{ pubkey.fingerprint }}">嫑了</a>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	{% else %}
+	<p>没有 pubkey</p>
+	<a class="btn btn-xs btn-info pull-left" href="/ui/add_pubkey">增加一枚</a> 
+	{% endif %}
+</div>
 
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <td>Fingerprint</td>
-        <td>Title</td>
-        <td>Ops</td>
-      </tr>
-    </thead>
-    <tbody>
-      {% for key in pubkeys %}
-        <tr>
-            <td>{{ key.fingerprint}}</td>
-            <td>{{ key.title }}</td>
-            <td>
-                <a id="delete" class="pkeybtn btn btn-xs btn-warning" data-keyfp="{{ key.fingerprint }}">嫑了</a>
-            </td>
-        </tr>
-      {% else %}
-        <tr> <td colspan="3">什么都没有</td> </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+<div class="col-md-8 col-md-offset-2 line-bottom">
+	<p>你的 token: {{ g.user.token }}</p>
+	<a class="genbtn btn-xs btn-warning" href="#">更新 token</a> 
+</div>
+
+<div class="col-md-8 col-md-offset-2">
+  <p>移动端 VPN 证书下载</p>
+  <a class="btn-xs btn-info" href="{{ url_for('ui.download_config') }}" target="_blank">点我下载证书</a> 
+</div>
 {% endblock %}
 
 {% block bottom_script %}
 <script>
-  $('.pkeybtn').click(function (){
-    var self = $(this);
-    $.post('/ui/delete_pubkey', {keyfp: self.data('keyfp')}, function (){
-      self.parent().remove();
-      location.reload();
-    });
-  });
+	$('.pkeybtn').click(function (){
+		var self = $(this);
+		$.post('/ui/delete_pubkey', {keyfp: self.data('keyfp')}, function (){
+			self.parent().remove();
+			location.reload();
+		});
+	});
+
+	$('.genbtn').click(function(){
+		var self = $(this);
+		if (!confirm("确认删除么, 你的ssh公钥也都会被删除")) {
+			return; 
+		}
+		$.post('/ui/refresh_token', {user_id: self.data('user-id')}, function(){
+			location.reload();
+		});
+	});
+
+	$('.downloadbtn').click(function(){
+		var self = $(this);
+		$.post('/ui/download_config', {user_id: self.data('user-id')}, function(){
+			//alert("download...");
+		});
+	});
 </script>
 {% endblock %}

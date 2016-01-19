@@ -6,6 +6,7 @@ from werkzeug.security import gen_salt, generate_password_hash, check_password_h
 
 from neptulon.ext import db
 from neptulon.models.base import Base
+from neptulon.models.pubkey import RSAKey
 
 
 class User(Base):
@@ -53,6 +54,10 @@ class User(Base):
         if limit is not None:
             q = q.limit(limit)
         return q.all(), total
+
+    @property
+    def pubkey(self):
+        return RSAKey.get_by_user_id(self.id)
 
     def edit(self, name, email, password, real_name):
         if password:
