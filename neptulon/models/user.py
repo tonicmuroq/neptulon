@@ -57,7 +57,8 @@ class User(Base):
 
     @property
     def pubkey(self):
-        return RSAKey.get_by_user_id(self.id)
+        key = RSAKey.get_by_user_id(self.id)
+        return key and key.rsa or ''
 
     def edit(self, name, email, password, real_name):
         if password:
