@@ -90,8 +90,18 @@ class User(Base):
     def get_auths(self):
         return Auth.query.filter_by(user_id=self.id).order_by(Auth.id.desc()).all()
 
-    def to_dict(self):
-        return {'name': self.name, 'email': self.email, 'realname': self.real_name}
+    def to_dict(self, private=False):
+        d = {
+            'id': self.id,
+            'name': self.name,
+            'email': self.email,
+            'real_name': self.real_name,
+            'privilege': self.privilege,
+        }
+        if private:
+            d['token'] = self.token
+            d['pubkey'] = self.pubkey
+        return d
 
     def delete(self):
         db.session.delete(self)

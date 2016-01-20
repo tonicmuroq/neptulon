@@ -120,34 +120,18 @@ def authorized_tokens():
 @oauth.require_oauth()
 def me():
     user = request.oauth.user
-    return jsonify(
-        id=user.id,
-        name=user.name,
-        email=user.email,
-        real_name=user.real_name,
-        token=user.token,
-        privilege=user.privilege,
-        pubkey=user.pubkey,
-    )
+    return jsonify(user.to_dict(private=True)), 200
 
 
 @bp.route('/api/user/<user_id>')
 @oauth.require_oauth()
 def get_user(user_id):
-    user = request.oauth.user
-    if not user.privilege and user.id != user_id:
-        return jsonify({}), 403
-
     u = User.get(user_id)
     if not u:
         return jsonify({}), 404
 
-    return jsonify(
-        id=u.id,
-        name=u.name,
-        email=u.email,
-        real_name=u.real_name,
-        token=u.token,
-        privilege=u.privilege,
-        pubkey=user.pubkey,
-    )
+    user = request.oauth.user
+    if not user.privilege and user.id != user_id:
+        return jsonify(u.to_dict()), 403
+
+    return jsonify(u.to_dict(private=True)), 200
