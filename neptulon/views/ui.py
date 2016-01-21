@@ -35,7 +35,7 @@ def download_config():
     resp.headers['Content-Type'] = "application/octet-stream"
     resp.headers['Pragma'] = "No-cache"
     resp.headers['Cache-Control'] = "No-cache"
-    resp.headers['Content-Disposition'] = "attachment; filename='ricebook-mobile.config'"
+    resp.headers['Content-Disposition'] = "attachment; filename='ricebook.mobileconfig'"
     return resp
 
 
