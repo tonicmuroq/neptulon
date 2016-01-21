@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Register Success</title>
+  <style>
+    .metainfo {
+      font-size: 12px;
+      background-color: #efefef;
+      padding: 1em;
+    }
+  </style>
+</head>
+<body>
+  <h2>用户注册成功</h2>
+  <div class="metainfo">
+    <p>{{ user.real_name }}，欢迎您！您的ID为{{ user.name }}，初始密码为{{ password }}，请马上登录修改密码！</p>
+    <p>点击 <a href="http://sso.ricebook.net/ui/password" target="_blank">这里</a> 登录.</p>
+  </div>
+</body>
+</html>
