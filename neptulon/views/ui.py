@@ -15,8 +15,7 @@ bp = Blueprint('ui', __name__, url_prefix='/ui')
 @bp.route('/', methods=['GET'])
 @need_login
 def index():
-    auths = g.user.get_auths()
-    return render_template('/auths.html', auths=auths, user=g.user)
+    return redirect(url_for('oauth.authorized_tokens'))
 
 
 @bp.route('/refresh_token', methods=['POST'])
