@@ -27,6 +27,8 @@ MAIL_USE_SSL = bool(os.getenv('MAIL_USE_SSL', '1'))
 MAIL_USERNAME = os.getenv('MAIL_USERNAME', '')
 MAIL_PASSWORD = os.getenv('MAIL_PASSWORD', '')
 
+VPN_CONFIG_FILE = os.getenv('VPN_CONFIG_FILE', '')
+
 try:
     from .local_config import *
 except ImportError:
