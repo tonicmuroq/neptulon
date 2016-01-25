@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from flask import Blueprint, request, render_template
+from flask import Blueprint, request
 from neptulon.models import User
 
 bp = Blueprint('api', __name__, url_prefix='/api')
@@ -11,5 +11,4 @@ def get_token():
     user = User.get_by_name(name)
     if user:
         return user.token, 200
-    else:
-        return render_template('/400.html'), 400
+    return '', 400
