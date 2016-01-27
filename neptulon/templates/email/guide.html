@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Guide</title>
+  <style>
+    .metainfo {
+      font-size: 12px;
+      background-color: #efefef;
+      padding: 1em;
+    }
+  </style>
+</head>
+<body>
+  <h2>用户使用说明</h2>
+  <div class="metainfo">
+    <h3>{{ user.real_name }}，欢迎您使用Ricebook SSO！请按照以下步骤设置：</h3>
+      <ul>
+        <li>您的用户名是：{{ user.name }}</li>
+        <li>您的初始密码是：111111</li>
+      </ul>
+      <h4>如果您是Mac OS X用户：</h4>
+        <ol>
+          <li>安装<a href="https://tunnelblick.net/downloads.html" target="_blank">Tunnelblick OpenVPN</a></li>
+          <li>下载附件nova.zip，解压后会产生一个nova的文件夹，双击文件夹即可运行Tunnelblick，并将设置加载到Tunnelblick</li>
+          <li>打开Tunnelblick，连接nova</li> 
+        </ol>
+
+      <h4>如果您是Android用户：</h4>
+      <ol>
+        <li>选择添加vpn连接，类型选择IPSec Xauth PSK</li>
+        <li>地址为vpn.ricebook.net</li>
+        <li>identifier留空</li>
+        <li>密码为ipsec</li>
+      </ol>
+
+      <h4>如果您是Windows用户：</h4>
+        <ol>
+          <li>下载附件Ricebook IKEv2 VPN.pbk，双击即可连接</li>
+        </ol>
+
+      <h3>完成以上配置后，请立即访问<a href="http://sso.ricebook.net/ui/password" target="_blank">Ricebook SSO</a>，修改您的密码！！！</h3>
+
+  </div>
+</body>
+</html>
