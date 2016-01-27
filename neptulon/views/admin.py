@@ -3,7 +3,7 @@
 from flask import Blueprint, request, redirect, url_for, render_template, flash, jsonify, abort, g
 from flask.ext.mail import Message
 from neptulon.ext import mail
-from neptulon.config import MAIL_USERNAME, VPN_CONFIG_FILE
+from neptulon.config import MAIL_USERNAME, MAC_VPN_CONFIG_FILE, WIN_VPN_CONFIG_FILE
 
 from neptulon.utils import need_admin
 from neptulon.models import User, RSAKey
@@ -65,9 +65,20 @@ def register():
                 recipients=[email]
             )
     message.html = render_template('/email/register_success.html', user=u, password=password)
-    with open(VPN_CONFIG_FILE) as f:
-        message.attach('nova.zip', 'application/octet-stream', f.read())
     mail.send(message)
+
+    message = Message(
+                subject=u'用户使用说明',
+                sender=MAIL_USERNAME,
+                recipients=[email]
+            )
+    message.html = render_template('/email/guide.html', user=u)
+    with open(MAC_VPN_CONFIG_FILE) as f:
+        message.attach('nova.zip', 'application/octet-stream', f.read())
+    with open(WIN_VPN_CONFIG_FILE) as f:
+        message.attach('Ricebook_IKEv2_VPN.pbk ', 'application/octet-stream', f.read())
+    mail.send(message)
+
     return redirect(url_for('admin.index'))
 
 
