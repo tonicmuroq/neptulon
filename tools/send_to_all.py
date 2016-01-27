@@ -33,7 +33,6 @@ def send_emails():
         for i in range(total):
             u = users.pop()
             send_email(u)
-            print u
         print 'all emails have been sent.'
 
 if __name__ == '__main__':
