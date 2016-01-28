@@ -1,11 +1,11 @@
 # coding: utf-8
 
 from datetime import datetime, timedelta
-from flask import Blueprint, request, jsonify, g, redirect, render_template, url_for, flash
+from flask import Blueprint, request, g, redirect, render_template, url_for, flash
 
 from neptulon.ext import oauth
 from neptulon.models import Grant, Token, Client, User
-from neptulon.utils import need_login, need_admin
+from neptulon.utils import need_login, need_admin, jsonize
 
 bp = Blueprint('oauth', __name__, url_prefix='/oauth')
 _THOUSAND_DAY = 86400 * 1000
@@ -72,15 +72,16 @@ def authorize(*args, **kwargs):
 
 @bp.route('/delete_token', methods=['POST'])
 @need_login
+@jsonize
 def delete_token():
     token_id = request.form['token']
     token = Token.get(token_id)
     if not token:
-        return jsonify({'message': 'not found'}), 404
+        return {'message': 'not found'}, 404
     if token.user_id != g.user.id:
-        return jsonify({'message': 'not allowed'}), 403
+        return {'message': 'not allowed'}, 403
     token.delete()
-    return jsonify({'message': 'ok'})
+    return {'message': 'ok'}
 
 
 @bp.route('/client', methods=['GET', 'POST'])
@@ -102,11 +103,12 @@ def client():
 
 @bp.route('/delete_client', methods=['POST'])
 @need_admin
+@jsonize
 def delete_client():
     client_id = request.form['client']
     client = Client.get(client_id)
     client.delete()
-    return jsonify({'message': 'ok'})
+    return {'message': 'ok'}
 
 
 @bp.route('/authorized', methods=['GET'])
@@ -118,20 +120,29 @@ def authorized_tokens():
 
 @bp.route('/api/me')
 @oauth.require_oauth()
+@jsonize
 def me():
     user = request.oauth.user
-    return jsonify(user.to_dict(private=True)), 200
+    return user.to_dict(private=True), 200
 
 
 @bp.route('/api/user/<user_id>')
 @oauth.require_oauth()
+@jsonize
 def get_user(user_id):
     u = User.get(user_id)
     if not u:
-        return jsonify({}), 404
+        return {}, 404
 
     user = request.oauth.user
-    if not user.privilege and user.id != user_id:
-        return jsonify(u.to_dict()), 403
+    private = bool(user.privilege) or user.id == user_id
+    return u.to_dict(private=private), 200
 
-    return jsonify(u.to_dict(private=True)), 200
+
+@bp.route('/api/users')
+@oauth.require_oauth()
+@jsonize
+def get_users():
+    users = User.list_users(g.start, g.limit)
+    private = bool(request.oauth.user.privilege)
+    return [u.to_dict(private=private) for u in users if u], 200
