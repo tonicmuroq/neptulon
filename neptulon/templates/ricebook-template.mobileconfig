@@ -28,7 +28,7 @@
                     <integer>0</integer>
                 </dict>
                 <key>PayloadDescription</key>
-                <string>配置 VPN 设置（包括鉴定）。</string>
+                <string>Configure VPN Setting(Including Authentication)</string>
                 <key>PayloadDisplayName</key>
                 <string>Ricebook IPSec</string>
                 <key>PayloadIdentifier</key>
@@ -50,7 +50,7 @@
             </dict>
         </array>
         <key>PayloadDescription</key>
-        <string>描述文件描述。</string>
+        <string>Description for Config File</string>
         <key>PayloadDisplayName</key>
         <string>ricebook IPSec</string>
         <key>PayloadIdentifier</key>

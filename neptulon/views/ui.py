@@ -39,6 +39,17 @@ def download_config():
     return resp
 
 
+@bp.route('/download_surge_config')
+@need_login
+def download_surge_config():
+    resp = make_response(render_template('/surge-template.conf', username=g.user.name, password=g.user.token))
+    resp.headers['Content-Type'] = "application/octet-stream"
+    resp.headers['Pragma'] = "No-cache"
+    resp.headers['Cache-Control'] = "No-cache"
+    resp.headers['Content-Disposition'] = "attachment; filename='nova.conf'"
+    return resp
+
+
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
