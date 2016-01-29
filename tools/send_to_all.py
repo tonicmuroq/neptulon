@@ -14,7 +14,7 @@ from neptulon.models import User
 
 def send_emails():
     with app.app_context():
-        users, total = User.list_users(limit=2)
+        users, total = User.list_users()
         for u in users:
             if u.id:
                 if not u.send_doc_email():
