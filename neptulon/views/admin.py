@@ -7,9 +7,6 @@ from neptulon.models import User, RSAKey
 
 bp = Blueprint('admin', __name__, url_prefix='/admin')
 
-reload(sys)
-sys.setdefaultencoding('utf-8')
-
 @bp.route('/', methods=['GET'])
 def index():
     admin = request.args.get('admin')
