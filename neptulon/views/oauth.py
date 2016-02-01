@@ -143,6 +143,6 @@ def get_user(user_id):
 @oauth.require_oauth()
 @jsonize
 def get_users():
-    users = User.list_users(g.start, g.limit)
+    users, _ = User.list_users(g.start, g.limit)
     private = bool(request.oauth.user.privilege)
     return [u.to_dict(private=private) for u in users if u], 200
