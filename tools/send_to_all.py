@@ -23,7 +23,7 @@ def send_email(user):
     with open(MAC_VPN_CONFIG_FILE) as f:
         message.attach('nova.zip', 'application/octet-stream', f.read())
     with open(WIN_VPN_CONFIG_FILE) as f:
-        message.attach('Ricebook_IKEv2_VPN.pbk ', 'application/octet-stream', f.read())
+        message.attach('ikev2vpn.zip', 'application/octet-stream', f.read())
     mail.send(message)
 
 
