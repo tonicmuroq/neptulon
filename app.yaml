@@ -3,7 +3,13 @@ entrypoints:
   web:
     cmd: "gunicorn -c gunicorn_config.py app:app"
     ports:
+      - "5000/tcp"
+    network_mode: "none"
+  web-host:
+    cmd: "gunicorn -c gunicorn_config.py app:app"
+    ports:
       - "5002/tcp"
     network_mode: "host"
 build:
+  - "pip install -U pip"
   - "pip install -r requirements.txt"

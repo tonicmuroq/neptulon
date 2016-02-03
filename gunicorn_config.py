@@ -1,6 +1,4 @@
-import os
-
-bind = '0.0.0.0:%s' % os.getenv('SERVER_PORT', '5000')
+bind = '0.0.0.0:5000'
 graceful_timeout = 3600
 timeout = 3600
 max_requests = 120
