@@ -4,9 +4,13 @@ import datetime
 import sqlalchemy.exc
 from werkzeug.security import gen_salt, generate_password_hash, check_password_hash
 
+from flask import render_template
 from neptulon.ext import db
 from neptulon.models.base import Base
 from neptulon.models.pubkey import RSAKey
+from flask.ext.mail import Message
+from neptulon.ext import mail
+from neptulon.config import MAIL_USERNAME, MAC_VPN_CONFIG_FILE, WIN_VPN_CONFIG_FILE
 
 
 class User(Base):
@@ -107,6 +111,23 @@ class User(Base):
         db.session.delete(self)
         db.session.commit()
 
+    def send_doc_email(self):
+        message = Message(
+                    subject=u'翻墙账号及Surge网络配置使用说明',
+                    sender=MAIL_USERNAME,
+                    recipients=[self.email])
+        message.html = render_template('/email/guide.html', user=self)
+        with open(MAC_VPN_CONFIG_FILE) as f:
+            message.attach('nova.zip', 'application/octet-stream', f.read())
+        with open(WIN_VPN_CONFIG_FILE) as f:
+            message.attach('ikev2vpn.zip', 'application/octet-stream', f.read())
+        message.attach('surge.conf', 'application/octet-stream', render_template('/surge-template.conf', username=self.name, password=self.token))
+        message.attach('ricebook.mobileconfig', 'application/octet-stream', render_template('/ricebook-template.mobileconfig', username=self.name, password=self.token))
+        try:
+            mail.send(message)
+        except:
+            return False
+        return True
 
 class Auth(Base):
 
